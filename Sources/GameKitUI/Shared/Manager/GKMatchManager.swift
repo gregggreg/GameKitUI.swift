@@ -65,6 +65,7 @@ public final class GKMatchManager: NSObject {
     
     private(set) public var localPlayer = CurrentValueSubject<GKLocalPlayer, Never>(GKLocalPlayer.local)
     private(set) public var match = CurrentValueSubject<Match, Never>(Match.zero)
+	private(set) public var turnBasedMatch = CurrentValueSubject<TurnBasedMatch, Never>(TurnBasedMatch.zero)
     private(set) public var invite = CurrentValueSubject<Invite, Never>(Invite.zero)
     
     private var canceled: () -> Void = {}
@@ -123,6 +124,7 @@ public final class GKMatchManager: NSObject {
         GKMatchmaker.shared().cancel()
         self.invite.send(Invite.zero)
         self.match.send(Match.zero)
+		self.turnBasedMatch.send(TurnBasedMatch.zero)
     }
 }
 
@@ -203,4 +205,28 @@ extension GKMatchManager: GKLocalPlayerListener {
         os_log("Player invited: %{public}@", log: OSLog.invite, type: .info, invite)
         self.invite.send(Invite(gkInvite: invite))
     }
+	
+	public func player(_ player: GKPlayer, matchEnded match: GKTurnBasedMatch) {
+		self.turnBasedMatch.send(TurnBasedMatch(gkMatch: match))
+	}
+	
+	public func player(_ player: GKPlayer, receivedTurnEventFor match: GKTurnBasedMatch, didBecomeActive: Bool) {
+		self.turnBasedMatch.send(TurnBasedMatch(gkMatch: match))
+	}
+	
+	public func player(_ player: GKPlayer, wantsToQuitMatch match: GKTurnBasedMatch) {
+		self.turnBasedMatch.send(TurnBasedMatch(gkMatch: match))
+	}
+	
+	public func player(_ player: GKPlayer, receivedExchangeRequest exchange: GKTurnBasedExchange, for match: GKTurnBasedMatch) {
+		self.turnBasedMatch.send(TurnBasedMatch(gkMatch: match))
+	}
+	
+	public func player(_ player: GKPlayer, receivedExchangeCancellation exchange: GKTurnBasedExchange, for match: GKTurnBasedMatch) {
+		self.turnBasedMatch.send(TurnBasedMatch(gkMatch: match))
+	}
+	
+	public func player(_ player: GKPlayer, receivedExchangeReplies replies: [GKTurnBasedExchangeReply], forCompletedExchange exchange: GKTurnBasedExchange, for match: GKTurnBasedMatch) {
+		self.turnBasedMatch.send(TurnBasedMatch(gkMatch: match))
+	}
 }

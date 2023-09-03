@@ -26,7 +26,7 @@
 import GameKit
 
 public struct Match {
-    public private(set) var gkMatch: GKMatch?
+    public var gkMatch: GKMatch?
 }
 
 extension Match {
